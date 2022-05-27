@@ -1,0 +1,12 @@
+[Unit]
+Description=this is the service systemd file
+After=network.target
+
+[Service]
+User=<username>
+WorkingDirectory=<path to your app>
+ExecStart=<app start command>
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

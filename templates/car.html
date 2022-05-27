@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>RP {{ Car }} 参数</title>
+</head>
+<body>
+  <p>
+    <h2>{{ Car }} 参数信息</h2>
+      {% for para in Paras %}
+      <li>
+        <form method="post" action="/api/update_Para" >
+            <button type="submit" name="Para_name" value="{{ para.Para_name }}">更新参数</button>
+            {{ para.Para_name[para.Car_name.__len__() + 1:] }}
+            <input type="text" name="Para_val" value="{{ para.Para_val }}" required>
+            <input type="hidden" name="Car_name" value="{{ Car }}">
+        </form>
+        <form method="post" action="/api/del_Para" >
+            <input type="hidden" name="Car_name" value="{{ Car }}">
+            <button type="submit" name="Para_name" value="{{ para.Para_name }}">删除参数</button>
+        </form>
+      </li>
+      
+      {% endfor %}
+  </p>
+  <p>
+
+  </p>
+  <p>
+    <form method="post" action="/api/add_Para" >
+        参数名 <input type="text" name="Para_name" required>
+        参数类 <input type="text" name="Para_type" required>
+        参数值 <input type="text" name="Para_val" required>
+        <button type="submit" name="Car_name" value="{{ Car }}">添加参数</button>
+    </form>
+  </p>
+  
+
+</body>
+</html>

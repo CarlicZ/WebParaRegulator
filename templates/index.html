@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>RP 车辆参数系统</title>
+</head>
+<body>
+  <h1>RP 车辆参数系统</h1>
+  <p>
+    <h2>车辆信息</h2>
+      {% for car in Cars %}
+        <form method="post" action="./api/del_Car">
+          <li>
+            <a href="./car/{{ car.Car_name }}">{{ car.Car_name }}</a>
+            <button type="submit" name="name" value="{{ car.Car_name }}">删除</button>
+          </li>
+        </form>
+      {% endfor %}
+      <iframe id="add_frame" name="add_frame" style="display:none;"></iframe>
+  </p>
+  <form method="post" action="./api/add_Car" >
+    车辆名 <input type="text" name="name" autocomplete="off" required>
+    <button type="submit">添加车辆</button>
+  </form>
+  
+  <iframe id="output_frame" name="output_frame" style="display:none;"></iframe>
+
+</body>
+</html>
