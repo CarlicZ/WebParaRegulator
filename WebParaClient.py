@@ -24,7 +24,7 @@ def WebParaClient(gap, host, port, car, to, retry, flag):
         Car_para_json = {}
         try: 
             # 检查read_flag.json是否需要重置车辆参数更新位
-            flag_f = open(flag)
+            flag_f = open(flag, "wr")
             flag_json = json.load(flag_f)
             # 程序已经读取完了参数，说明服务端的数据没有更新
             if flag_json['Read_flag'] == True: 
