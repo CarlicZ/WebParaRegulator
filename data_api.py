@@ -216,4 +216,4 @@ def car(Car_name):
 # 获取所有车api
 
 if __name__ == "__main__": 
-    data_api.run()
+    data_api.run(host='0.0.0.0', port=5000)
