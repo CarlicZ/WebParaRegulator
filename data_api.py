@@ -58,21 +58,21 @@ def initdb(drop):
 # get_Cars_api接口, 获取车辆的API
 @data_api.route('/api/get_Cars')
 def get_Cars_api():
-    Cars = Car.query.all()
+    Cars = Car.query.all() # 获取全部车子对象
     Cars_json = {}
     for car in Cars: 
         Cars_json[car.Car_name]={"Update_flag": car.Update_flag}
     print(Cars_json)
-    return json.dumps(Cars_json, ensure_ascii=False)
+    return json.dumps(Cars_json, ensure_ascii=False) # 将车子对象以及更新标志打包为json返回
 
 # add_Car_api接口, 增加车子的API
 @data_api.route('/api/add_Car', methods=["POST"])
 def add_Car_api(): 
-    if request.method == 'POST':  
-        tmp_Car_name = request.form.get('name')
-        tmp_Car = Car(Car_name=tmp_Car_name, Update_flag=1)
-        try: 
-            db.session.add(tmp_Car)
+    if request.method == 'POST':  # 对POST请求操作
+        tmp_Car_name = request.form.get('name') # 获取需要添加的车子名称
+        tmp_Car = Car(Car_name=tmp_Car_name, Update_flag=0) # 生成新添加的车对象
+        try: # 尝试添加车辆，对错误抛出并返回错误信息
+            db.session.add(tmp_Car) 
             db.session.commit()
         except: 
             return "Add Car Fail!"
@@ -84,11 +84,11 @@ def add_Car_api():
 # del_Car_api接口, 删除车子的API
 @data_api.route('/api/del_Car', methods=["POST"])
 def del_Car_api(): 
-    if request.method == 'POST':  
-        tmp_Car_name = request.form.get('name')
-        tmp_Car = Car.query.get_or_404(tmp_Car_name)
-        tmpParas = Para.query.filter(Para.Car_name == tmp_Car_name).all()
-        try: 
+    if request.method == 'POST':  # 对POST请求操作
+        tmp_Car_name = request.form.get('name') # 获取需要删除的车子名称
+        tmp_Car = Car.query.get_or_404(tmp_Car_name) # 获取数据库中需要删除的车子对象
+        tmpParas = Para.query.filter(Para.Car_name == tmp_Car_name).all() # 获取数据库中需要删除的车子的参数对象
+        try: # 尝试删除车辆，对错误抛出并返回错误信息
             db.session.delete(tmp_Car)
             for para in tmpParas: 
                 db.session.delete(para)
@@ -96,25 +96,27 @@ def del_Car_api():
         except: 
             return "Delete Car Fail!"
         else: 
-            return redirect(url_for("index"))
+            return "Delete Car Success!"
     else: 
         return "Delete Car Fail!"
 
 # reset_Car_api接口, 消除车子更新的API
 @data_api.route('/api/reset_Car', methods=["POST"])
 def reset_Car_api(): 
-    if request.method == 'POST':  
+    if request.method == 'POST': # 处理POST请求
+        # 找车辆对象
         tmp_Car_name = request.form.get('name')
-        tmp_Car = Car.query.get_or_404(tmp_Car_name)
-        try: 
-            tmp_Car.Update = 0
-            db.session.commit()
+        tmp_Car = Car.query.get(tmp_Car_name)
+        try: # 尝试修改车辆对象
+            if tmp_Car.Update_flag == 1:
+                tmp_Car.Update_flag = 0
+                db.session.commit()
         except: 
-            return "Delete Car Fail!"
+            return "Reset Car Fail!"
         else: 
-            return redirect(url_for("index"))
+            return "Reset " + tmp_Car_name + " Success"
     else: 
-        return "Delete Car Fail!"
+        return "Reset Car Fail!"
 
 # get_Paras_api接口, 获取车辆所有参数的API
 @data_api.route('/api/get_Paras/<Car_name>')
@@ -140,8 +142,10 @@ def add_Para_api():
                       Car_name=tmp_Car_name, 
                       Para_type=tmp_Para_type, 
                       Para_val=tmp_Para_val)
+        Car_update = Car.query.get(tmp_Car_name)
         try: 
             db.session.add(tmp_Para)
+            Car_update.Update_flag = 1
             db.session.commit()
         except: 
             return "Add Para Fail!"
@@ -157,8 +161,10 @@ def del_Para_api():
         tmp_Car_name = request.form.get('Car_name')
         tmp_Para_name = request.form.get('Para_name')
         Para_del = Para.query.get(tmp_Para_name)
+        Car_update = Car.query.get(tmp_Car_name)
         try: 
             db.session.delete(Para_del)
+            Car_update.Update_flag = 1
             db.session.commit()
         except: 
             return "Delete Para Fail!"
@@ -167,7 +173,7 @@ def del_Para_api():
     else: 
         return "Delete Para Fail!"
 
-# update_Para_api接口, 删除车子的API
+# update_Para_api接口, 更新车子参数的api
 @data_api.route('/api/update_Para', methods=["POST"])
 def update_Para_api(): 
     if request.method == 'POST':  
