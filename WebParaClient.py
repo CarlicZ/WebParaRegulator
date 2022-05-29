@@ -23,9 +23,17 @@ def WebParaClient(gap, host, port, car, to, retry, flag):
     while True:
         Car_para_json = {}
         try: 
-            # 检查read_flag.json是否需要重置车辆参数更新位
-            flag_f = open(flag)
-            flag_json = json.load(flag_f)
+        # 检查read_flag.json是否需要重置车辆参数更新位
+            if  not os.path.exists(flag):
+                f_tmp=open(flag,"w")
+                f_tmp.close()
+            flag_f = open(flag, "r")
+            try:
+                flag_json = json.load(flag_f)
+            except:
+                flag_json={}
+            if 'Read_flag' not in flag_json:
+                flag_json['Read_flag']=False
             # 程序已经读取完了参数，说明服务端的数据没有更新
             if flag_json['Read_flag'] == True: 
                 print("[info] reset car")
@@ -39,6 +47,7 @@ def WebParaClient(gap, host, port, car, to, retry, flag):
             
             # 获取车辆参数
             Car_para = requests.get("http://" + host +":" + port + "/api/get_Paras/" + car)
+            print("http://" + host +":" + port + "/api/get_Paras/" + car)
             tmp_json = json.loads(Car_para.text)
             # 对参数作类别分析
             for i in tmp_json: 
