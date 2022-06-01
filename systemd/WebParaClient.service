@@ -1,11 +1,11 @@
 [Unit]
-Description=this is the client systemd file
+Description=this is the client systemd file of WebParaRagulator program
 After=network.target
 
 [Service]
-User=<username>
-WorkingDirectory=<path to your app>
-ExecStart=<app start command>
+User=<Username>
+WorkingDirectory=<Path of WebParaClient.py>
+ExecStart=<Path of python3>/python3 <Path of WebParaClient.py>/WebParaClient.py --car <car name> --host <Server Host> --port <server port> --retry 1
 Restart=always
 
 [Install]

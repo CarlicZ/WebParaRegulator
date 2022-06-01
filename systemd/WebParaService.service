@@ -1,11 +1,11 @@
 [Unit]
-Description=this is the service systemd file
+Description=Description=this is the service systemd file of WebParaRagulator program
 After=network.target
 
 [Service]
-User=<username>
-WorkingDirectory=<path to your app>
-ExecStart=<app start command>
+User=<Username>
+WorkingDirectory=<Path of data_api.py>
+ExecStart=<Path of python3>/python3 <Path of data_api.py>/data_api.py
 Restart=always
 
 [Install]
