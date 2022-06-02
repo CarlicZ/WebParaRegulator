@@ -11,7 +11,7 @@
     <h2>车辆信息</h2>
     <!-- 使用模板循环显示信息 -->
     {% for car in Cars %}
-      <form method="post" action="./api/del_Car">
+      <form method="post" action="./index_api/del_Car">
         <li>
           <!-- 删除按钮加跳转车辆页面链接 -->
           <a href="./car/{{ car.Car_name }}">{{ car.Car_name }}</a>
@@ -21,7 +21,7 @@
     {% endfor %}
     <iframe id="add_frame" name="add_frame" style="display:none;"></iframe>
   </p>
-  <form method="post" action="./api/add_Car" >
+  <form method="post" action="./index_api/add_Car" >
     车辆名 <input type="text" name="name" autocomplete="off" required>
     <button type="submit">添加车辆</button>
   </form>

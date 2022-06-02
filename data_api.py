@@ -42,6 +42,75 @@ class Para(db.Model):
     Para_type = db.Column(db.String(60))
     Para_val = db.Column(db.String(60))
 
+
+# ************** 表操作接口 **************
+#### 删除车辆方法
+def del_Car(Car_name): 
+    tmp_Car = Car.query.get_or_404(Car_name) # 获取数据库中需要删除的车子对象
+    tmpParas = Para.query.filter(Para.Car_name == Car_name).all() # 获取数据库中需要删除的车子的参数对象
+    try: # 尝试删除车辆，对错误抛出并返回错误信息
+        db.session.delete(tmp_Car)
+        for para in tmpParas: 
+            db.session.delete(para)
+        db.session.commit()
+    except: 
+        return False
+    else: 
+        return True
+
+#### 添加车辆方法
+def add_Car(Car_name): 
+    tmp_Car = Car(Car_name=Car_name, Update_flag=1) # 生成新添加的车对象
+    try: # 尝试添加车辆，对错误抛出并返回错误信息
+        db.session.add(tmp_Car) 
+        db.session.commit()
+    except: 
+        return False
+    else: 
+        return True
+
+#### 添加参数方法
+def add_Para(Car_name, Para_name, Para_type, Para_val): 
+    tmp_Para = Para(Para_name=Car_name + "_" + Para_name, 
+                    Car_name=Car_name, 
+                    Para_type=Para_type, 
+                    Para_val=Para_val)
+    Car_update = Car.query.get(Car_name)
+    try: 
+        db.session.add(tmp_Para)
+        Car_update.Update_flag = 1
+        db.session.commit()
+    except: 
+        return False
+    else: 
+        return True
+
+#### 删除参数方法
+def del_Para(Car_name, Para_name): 
+    Para_del = Para.query.get(Para_name)
+    Car_update = Car.query.get(Car_name)
+    try: 
+        db.session.delete(Para_del)
+        Car_update.Update_flag = 1
+        db.session.commit()
+    except: 
+        return False
+    else: 
+        return True
+
+#### 更新参数方法
+def update_Para(Car_name, Para_name, Para_val): 
+    Para_update = Para.query.get(Para_name)
+    Car_update = Car.query.get(Car_name)
+    try: 
+        Para_update.Para_val = Para_val
+        Car_update.Update_flag = 1
+        db.session.commit()
+    except: 
+        return False
+    else: 
+        return True
+
 # 初始化数据库，使用命令初始化
 @data_api.cli.command()  # 注册为命令
 @click.option('--drop', is_flag=True, help='Create after drop.')  # 设置选项
@@ -70,14 +139,10 @@ def get_Cars_api():
 def add_Car_api(): 
     if request.method == 'POST':  # 对POST请求操作
         tmp_Car_name = request.form.get('name') # 获取需要添加的车子名称
-        tmp_Car = Car(Car_name=tmp_Car_name, Update_flag=0) # 生成新添加的车对象
-        try: # 尝试添加车辆，对错误抛出并返回错误信息
-            db.session.add(tmp_Car) 
-            db.session.commit()
-        except: 
-            return "Add Car Fail!"
+        if del_Car(tmp_Car_name): 
+            return "Add Car Success!"
         else: 
-            return redirect(url_for("index"))
+            return "Add Car Fail!"
     else: 
         return "Add Car Fail!"
 
@@ -86,17 +151,11 @@ def add_Car_api():
 def del_Car_api(): 
     if request.method == 'POST':  # 对POST请求操作
         tmp_Car_name = request.form.get('name') # 获取需要删除的车子名称
-        tmp_Car = Car.query.get_or_404(tmp_Car_name) # 获取数据库中需要删除的车子对象
-        tmpParas = Para.query.filter(Para.Car_name == tmp_Car_name).all() # 获取数据库中需要删除的车子的参数对象
-        try: # 尝试删除车辆，对错误抛出并返回错误信息
-            db.session.delete(tmp_Car)
-            for para in tmpParas: 
-                db.session.delete(para)
-            db.session.commit()
-        except: 
-            return "Delete Car Fail!"
-        else: 
+        if del_Car(tmp_Car_name): 
             return "Delete Car Success!"
+        else: 
+            return "Delete Car Fail!"
+
     else: 
         return "Delete Car Fail!"
 
@@ -138,19 +197,10 @@ def add_Para_api():
         tmp_Para_name = request.form.get('Para_name')
         tmp_Para_type = request.form.get('Para_type')
         tmp_Para_val = request.form.get('Para_val')
-        tmp_Para = Para(Para_name=tmp_Car_name + "_" + tmp_Para_name, 
-                      Car_name=tmp_Car_name, 
-                      Para_type=tmp_Para_type, 
-                      Para_val=tmp_Para_val)
-        Car_update = Car.query.get(tmp_Car_name)
-        try: 
-            db.session.add(tmp_Para)
-            Car_update.Update_flag = 1
-            db.session.commit()
-        except: 
-            return "Add Para Fail!"
+        if add_Para(tmp_Car_name, tmp_Para_name, tmp_Para_type, tmp_Para_val): 
+            return "Add Para Success!"
         else: 
-            return redirect(url_for("car", Car_name=tmp_Car_name))
+            return "Add Para Fail!"
     else: 
         return "Add Para Fail!"
 
@@ -160,16 +210,10 @@ def del_Para_api():
     if request.method == 'POST':  
         tmp_Car_name = request.form.get('Car_name')
         tmp_Para_name = request.form.get('Para_name')
-        Para_del = Para.query.get(tmp_Para_name)
-        Car_update = Car.query.get(tmp_Car_name)
-        try: 
-            db.session.delete(Para_del)
-            Car_update.Update_flag = 1
-            db.session.commit()
-        except: 
-            return "Delete Para Fail!"
+        if del_Para(tmp_Car_name, tmp_Para_name): 
+            return "Delete Para Success!"
         else: 
-            return redirect(url_for("car", Car_name=tmp_Car_name))
+            return "Delete Para Fail!"
     else: 
         return "Delete Para Fail!"
 
@@ -180,16 +224,10 @@ def update_Para_api():
         tmp_Car_name = request.form.get('Car_name')
         tmp_Para_name = request.form.get('Para_name')
         tmp_Para_val = request.form.get('Para_val')
-        Para_update = Para.query.get(tmp_Para_name)
-        Car_update = Car.query.get(tmp_Car_name)
-        try: 
-            Para_update.Para_val = tmp_Para_val
-            Car_update.Update_flag = 1
-            db.session.commit()
-        except: 
-            return "Update Para Fail!"
+        if update_Para(tmp_Car_name, tmp_Para_name, tmp_Para_val): 
+            return "Update Para Success!"
         else: 
-            return redirect(url_for("car", Car_name=tmp_Car_name))
+            return "Update Para Fail!"
     else: 
         return "Update Para Fail!"
 
@@ -212,6 +250,74 @@ def car(Car_name):
                            Car=Car_name,
                            Paras=Paras
                            )
+
+
+# ************** demo页面api接口设计，用于按钮的重定向 **************
+# index页面删除车辆
+@data_api.route('/index_api/del_Car', methods=["POST"])
+def index_del_Car_api(): 
+    if request.method == 'POST':  # 对POST请求操作
+        tmp_Car_name = request.form.get('name') # 获取需要删除的车子名称
+        if del_Car(tmp_Car_name): 
+            return redirect(url_for("index"))
+        else: 
+            return "Delete Car Fail!"
+    else: 
+        return "Delete Car Fail!"
+
+# index页面添加车辆
+@data_api.route('/index_api/add_Car', methods=["POST"])
+def index_add_Car_api(): 
+    if request.method == 'POST':  # 对POST请求操作
+        tmp_Car_name = request.form.get('name') # 获取需要添加的车子名称
+        if add_Car(tmp_Car_name): 
+            return redirect(url_for("index"))
+        else: 
+            return "Add Car Fail!"
+    else: 
+        return "Add Car Fail!"
+
+# car页面添加参数
+@data_api.route('/car_api/add_Para', methods=["POST"])
+def car_add_Para_api(): 
+    if request.method == 'POST':  
+        tmp_Car_name = request.form.get('Car_name')
+        tmp_Para_name = request.form.get('Para_name')
+        tmp_Para_type = request.form.get('Para_type')
+        tmp_Para_val = request.form.get('Para_val')
+        if add_Para(tmp_Car_name, tmp_Para_name, tmp_Para_type, tmp_Para_val): 
+            return redirect(url_for("car", Car_name=tmp_Car_name))
+        else: 
+            return "Add Para Fail!"
+    else: 
+        return "Add Para Fail!"
+
+# car页面删除参数
+@data_api.route('/car_api/del_Para', methods=["POST"])
+def car_del_Para_api(): 
+    if request.method == 'POST':  
+        tmp_Car_name = request.form.get('Car_name')
+        tmp_Para_name = request.form.get('Para_name')
+        if del_Para(tmp_Car_name, tmp_Para_name): 
+            return redirect(url_for("car", Car_name=tmp_Car_name))
+        else: 
+            return "Add Para Fail!"
+    else: 
+        return "Add Para Fail!"
+
+# car页面更新参数
+@data_api.route('/car_api/update_Para', methods=["POST"])
+def car_update_Para_api(): 
+    if request.method == 'POST':  
+        tmp_Car_name = request.form.get('Car_name')
+        tmp_Para_name = request.form.get('Para_name')
+        tmp_Para_val = request.form.get('Para_val')
+        if update_Para(tmp_Car_name, tmp_Para_name, tmp_Para_val): 
+            return redirect(url_for("car", Car_name=tmp_Car_name))
+        else: 
+            return "Update Para Fail!"
+    else: 
+        return "Update Para Fail!"
 
 # 获取所有车api
 
