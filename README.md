@@ -59,5 +59,24 @@
 
 # 效果
 
-使用界面还未优化完成，待填坑
+## 主界面
 
+![image-20220604165535654](https://smcbaq-picture.oss-cn-guangzhou.aliyuncs.com/images_2/picgo/aliyunOSSimage-20220604165535654.png)
+
+功能：
+
+-   添加车辆
+-   删除车辆
+-   前往车辆参数页面
+
+# 车辆界面
+
+
+
+![image-20220604165520404](https://smcbaq-picture.oss-cn-guangzhou.aliyuncs.com/images_2/picgo/aliyunOSSimage-20220604165520404.png)
+
+功能：
+
+-   添加参数：参数名、类、值
+-   修改参数值
+-   删除参数
