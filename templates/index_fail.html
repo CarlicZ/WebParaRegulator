@@ -5,6 +5,23 @@
   <title>RP 车辆参数系统</title>
   <script src="http://code.jquery.com/jquery-1.8.0.min.js"></script>
   <style>
+    .total{
+      display: flex;
+      background: lightblue;
+      padding: 8px;
+    }
+
+    .side_bar{
+      justify-content: center;
+      background-color: lightcyan;
+      padding: 16px;
+      max-width: 360px;
+      min-width: 360px;
+    }
+
+    #content{
+      margin: 16px;
+    }
 
     .car_list{
       display: flex;
@@ -14,13 +31,10 @@
       padding-bottom: 8px;
       padding-left: 8px;
       padding-right: 8px;
+      max-width: 320px;
+      min-width: 320px;
       box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
       background-color: #f8f9fa;
-    }
-
-    .car_input{
-      padding-left: 16px;
-      padding-right: 16px;
     }
 
     .opt_but{
@@ -28,12 +42,6 @@
       justify-content: space-between;
       padding-left: 8px;
       padding-right: 8px;
-    }
-    .opt_but1 {
-      display: flex;
-      justify-content: space-between;
-      padding-left: 16px;
-      padding-right: 16px;
     }
 
     .title {
@@ -74,10 +82,7 @@
   <div class="total">
     <div class="side_bar">
       <form class="car_list" method="post" action="./index_api/add_Car" >
-        <div class="car_input">
-          <a>车辆名</a> <input type="text" name="name" autocomplete="off" required>
-        </div>
-        
+        车辆名 <input type="text" name="name" autocomplete="off" required>
         <button type="submit">添加车辆</button>
       </form>
       <h2 class="title">车辆列表</h2>
@@ -90,10 +95,10 @@
             <!-- 删除按钮加跳转车辆页面链接 -->
             <a  onclick="switch_page({{ car.Car_name }})">{{ car.Car_name }}</a>
             <div class="opt_but">
-              <form class="opt_but1" method="get" action="/car/{{ car.Car_name }}">
+              <form method="get" action="/car/{{ car.Car_name }}">
                 <button type="submit">前往</a>
               </form>
-              <form class="opt_but1" id="{{ car.Car_name }}" method="post">
+              <form id="{{ car.Car_name }}" method="post">
                 <button name="delete" onclick="del_Car({{ car.Car_name }})">删除</button>
                 <input type="hidden" name="name" value="{{ car.Car_name }}">
               </form>

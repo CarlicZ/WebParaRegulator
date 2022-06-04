@@ -5,41 +5,111 @@
   <title>RP {{ Car }} 参数</title>
 </head>
 <style>
-#para_line {
-  display: inline;
-}
+
+  /* .parameter {
+    height: 100px;
+  } */
+
+  .para_opt {
+    display: flex;
+    justify-content: space-between;
+    list-style-type: none;
+    margin: 16px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 16px;
+    padding-right: 16px;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+    background-color: #f8f9fa;
+  }
+
+  .para_add {
+    display: flex;
+    justify-content: space-between;
+    list-style-type: none;
+    margin: 16px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 16px;
+    padding-right: 16px;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+    background-color: #f8f9fa;
+  }
+
+  #car_title {
+    margin: 10px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
 </style>
 <script>
+  function update_Para(para_name){
+    document.getElementById(para_name).action = "/car_api/update_Para"; 
+    document.getElementById(para_name).method = "post";
+    document.getElementById(para_name).submit();
+  }
 
+  function del_Para(para_name){
+    var opt = confirm("是否确认删除!");
+    if (opt == true){
+      document.getElementById(para_name).action = "/car_api/del_Para"; 
+      document.getElementById(para_name).method = "post";
+      document.getElementById(para_name).submit();
+    }
+    else {
+      document.getElementById(para_name).method = "get";
+      return;
+    }
+  }
+
+  function add_Para(){
+    document.getElementById("add_Para").submit();
+  }
 </script>
 <body>
   <p>
-    <h2>{{ Car }} 参数信息</h2>
+    <h1 id="car_title">{{ Car }} 参数信息</h1>
+    <!-- 添加参数块 -->
+    <p>
+      <form id="add_Para" method = "post" action="/car_api/add_Para" class="para_add">
+        <div>
+          <a>参数名</a> <input type="text" name="Para_name" required>
+        </div>
+        <div>
+          <a>参数类</a> <input type="text" name="Para_type" required>
+        </div>
+        <div>
+          <a>参数值</a> <input type="text" name="Para_val" required>
+        </div>
+        <input type="hidden" name="Car_name" value="{{ Car }}">
+        <button name="add_Para" onclick="add_Para()">添加参数</button>
+      </form>
+    </p>
+
       {% for para in Paras %}
-        <form id="para_line" method="post" action="/car_api/update_Para" >
-            <button type="submit" name="Para_name" value="{{ para.Para_name }}">更新参数</button>
-            {{ para.Para_name[para.Car_name.__len__() + 1:] }}
+      <div class="parameter">
+        <script>
+          var {{ para.Para_name }} = "{{ para.Para_name }}";
+        </script>
+        <form id="{{ para.Para_name }}" class="para_opt">
+          <div>
+            <input type="hidden" name="Car_name" value="{{ Car }}">
+            <input type="hidden" name="Para_name" value="{{ para.Para_name }}">
+            <a>{{ para.Para_name[para.Car_name.__len__() + 1:] }}</a>
             <input type="text" name="Para_val" value="{{ para.Para_val }}" required>
-            <input type="hidden" name="Car_name" value="{{ Car }}">
+            <button name="update" onclick="update_Para({{ para.Para_name }})">更新参数</button>
+          </div>
+          <div>
+            <button name="delete" onclick="del_Para({{ para.Para_name }})">删除参数</button>
+          </div>
         </form>
-        <form id="para_line" method="post" action="/car_api/del_Para" >
-            <input type="hidden" name="Car_name" value="{{ Car }}">
-            <button type="submit" name="Para_name" value="{{ para.Para_name }}">删除参数</button>
-        </form>
-        <br>
+      </div>
       {% endfor %}
   </p>
-  <p>
-
-  </p>
-  <p>
-    <form method="post" action="/car_api/add_Para" >
-        参数名 <input type="text" name="Para_name" required>
-        参数类 <input type="text" name="Para_type" required>
-        参数值 <input type="text" name="Para_val" required>
-        <button type="submit" name="Car_name" value="{{ Car }}">添加参数</button>
-    </form>
-  </p>
+  
   
 
 </body>
